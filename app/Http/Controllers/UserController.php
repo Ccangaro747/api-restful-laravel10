@@ -125,16 +125,28 @@ class UserController extends Controller
     // Método para actualizar los datos del usuario identificado por JWT (Json Web Token)
     public function uptdate(Request $request)
     {
+        //Comprobar si el usuario esta identificado
         $token = $request->header('Authorization');
         $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController
         $checkToken = $jwtAuth->checkToken($token); // Llamar al método checkToken de la clase JwtAuth para comprobar si el token es válido
     
         if($checkToken){
-            echo "Correcto";
-        }else{
-            echo "Incorrecto";
+
+            //Recoger los datos por POST es decir lo que me llega del formulario o de la petición http
+            //Validar los datos
+            //Quitar los campos que no quiero actualizar
+            //Actualizar el usuario en la base de datos
+            //Devolver el array con el resultado
+
+            }else{
+            //Si el token no es válido, se devuelve un mensaje de error
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'El usuario no está identificado'
+            ];
         }
-        die();
+        return response()->json($data, $data['code']); // Devolver el mensaje de error en formato json.
     }
 
 }
