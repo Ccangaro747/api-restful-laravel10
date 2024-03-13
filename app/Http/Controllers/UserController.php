@@ -97,7 +97,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-        // La validación ha fallado
+            // La validación ha fallado
             $singup = [
                 'status' => 'error',
                 'code' => 400,
@@ -105,40 +105,50 @@ class UserController extends Controller
                 'errors' => $validator->errors()
             ];
         } else {
-        // Validación pasada correctamente
+            // Validación pasada correctamente
 
-        // Cifrar la contraseña
+            // Cifrar la contraseña
 
-        $pwd = Hash::make($params->password);
+            $pwd = Hash::make($params->password);
 
-        // Devolver el token o los datos decodificados según corresponda
+            // Devolver el token o los datos decodificados según corresponda
 
-        $singup = $jwtAuth->singup($params->email, $params->password);
-        if(!empty($params->getToken)){
-            $singup = $jwtAuth->singup($params->email, $params->password, true);
-        }
+            $singup = $jwtAuth->singup($params->email, $params->password);
+            if (!empty($params->getToken)) {
+                $singup = $jwtAuth->singup($params->email, $params->password, true);
+            }
         }
 
         return response()->json($singup, 200); // Llamar al método singup de la clase JwtAuth para loguear al usuario y conseguir el token de autenticación de usuario identificado por JWT (Json Web Token) 
     }
-    
+
     // Método para actualizar los datos del usuario identificado por JWT (Json Web Token)
-    public function uptdate(Request $request)
+    public function update(Request $request)
     {
         //Comprobar si el usuario esta identificado
         $token = $request->header('Authorization');
         $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController
-        $checkToken = $jwtAuth->checkToken($token); // Llamar al método checkToken de la clase JwtAuth para comprobar si el token es válido
-    
-        if($checkToken){
+        $checkToken = $jwtAuth->checkToken($token); // Obtener el usuario identificado
 
-            //Recoger los datos por POST es decir lo que me llega del formulario o de la petición http
-            //Validar los datos
-            //Quitar los campos que no quiero actualizar
-            //Actualizar el usuario en la base de datos
-            //Devolver el array con el resultado
+        // Verificar si el usuario está autenticado
+        if ($checkToken) {
+            //Recoger los datos por POST
+            $json = $request->input('json', null);
+            $params_array = json_decode($json, true);
 
-            }else{
+
+            //Sacar usuario identificado
+            $user = $jwtAuth->checkToken($token, true);
+
+        //Validar datos
+        $validate = Validator::make($params_array, [
+            'name' => 'required|alpha',
+            'surname' => 'required|alpha',
+            'email' => 'required|email|unique:users,' . $user->sub
+        ]);
+
+
+        } else {
             //Si el token no es válido, se devuelve un mensaje de error
             $data = [
                 'status' => 'error',
@@ -148,5 +158,18 @@ class UserController extends Controller
         }
         return response()->json($data, $data['code']); // Devolver el mensaje de error en formato json.
     }
+
+    // Método para subir la imagen del usuario identificado por JWT (Json Web Token)
+    public function upload(Request $request)
+    {
+        $data = [
+            'status' => 'error',
+            'code' => 400,
+            'message' => 'El usuario no está identificado'
+        ];
+        return response()->json($data, $data['code'])->header('Content-Type', 'text/plain');
+    }
+
+
 
 }

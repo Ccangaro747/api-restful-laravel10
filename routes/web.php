@@ -43,4 +43,8 @@ Route::post('/api/register', 'App\Http\Controllers\UserController@register');
 
 Route::post('/api/login', 'App\Http\Controllers\UserController@login');
 
-Route::post('/api/uptdate', 'App\Http\Controllers\UserController@uptdate');
+Route::put('/api/update', 'App\Http\Controllers\UserController@update');
+
+Route::post('/api/update', 'App\Http\Controllers\UserController@update');
+
+Route::post('/api/upload', 'App\Http\Controllers\UserController@upload');
