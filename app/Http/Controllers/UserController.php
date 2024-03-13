@@ -130,12 +130,12 @@ class UserController extends Controller
         $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController
         $checkToken = $jwtAuth->checkToken($token); // Obtener el usuario identificado
 
-        // Verificar si el usuario está autenticado
-        if ($checkToken) {
-            //Recoger los datos por POST
-            $json = $request->input('json', null);
-            $params_array = json_decode($json, true);
+                    //Recoger los datos por POST
+                    $json = $request->input('json', null);
+                    $params_array = json_decode($json, true);
 
+        // Verificar si el usuario está autenticado
+        if ($checkToken && !empty($params_array)) {
 
             //Sacar usuario identificado
             $user = $jwtAuth->checkToken($token, true);
@@ -147,6 +147,25 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,' . $user->sub
         ]);
 
+        //Quitar los campos que no quiero actualizar
+        unset($params_array['id']);
+        unset($params_array['role']);
+        unset($params_array['password']);
+        unset($params_array['created_at']);
+        unset($params_array['remember_token']);
+
+
+        //Actualizar el usuario en la base de datos
+        $user_update = User::where('id', $user->sub)->update($params_array);
+
+
+        //Devolver array con el resultado
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'user' => $user,
+            'changes' => $params_array
+        );
 
         } else {
             //Si el token no es válido, se devuelve un mensaje de error
