@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Post;
 use App\Category;
 
+// Cargando clases
+use App\Http\Middleware\ApiAuthMiddleware;
+
 /*
 RUTAS DE PRUEBA
 */
@@ -31,11 +34,11 @@ RUTAS API
 
 
 // Rutas de prueba
-Route::get('/user', 'App\Http\Controllers\UserController@pruebas');
+//Route::get('/user', 'App\Http\Controllers\UserController@pruebas');
 
-Route::get('/posts', 'App\Http\Controllers\PostController@pruebas');
+//Route::get('/posts', 'App\Http\Controllers\PostController@pruebas');
 
-Route::get('/category', 'App\Http\Controllers\CategoryController@pruebas');
+//Route::get('/category', 'App\Http\Controllers\CategoryController@pruebas');
 
 // Rutas del controlador de usuario
 
@@ -47,4 +50,12 @@ Route::put('/api/update', 'App\Http\Controllers\UserController@update');
 
 Route::post('/api/update', 'App\Http\Controllers\UserController@update');
 
-Route::post('/api/upload', 'App\Http\Controllers\UserController@upload');
+Route::post('/api/upload', 'App\Http\Controllers\UserController@upload')->middleware(ApiAuthMiddleware::class);
+
+Route::get('/api/avatar/{filename}', 'App\Http\Controllers\UserController@getImage');
+
+Route::get('/api/detail/{id}', 'App\Http\Controllers\UserController@detail');
+
+// Rutas del controlador de categorias
+
+Route::resource('/api/category', 'App\Http\Controllers\CategoryController');

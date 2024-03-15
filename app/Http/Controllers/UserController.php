@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\JwtAuth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -130,9 +133,9 @@ class UserController extends Controller
         $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController
         $checkToken = $jwtAuth->checkToken($token); // Obtener el usuario identificado
 
-                    //Recoger los datos por POST
-                    $json = $request->input('json', null);
-                    $params_array = json_decode($json, true);
+        //Recoger los datos por POST
+        $json = $request->input('json', null);
+        $params_array = json_decode($json, true);
 
         // Verificar si el usuario está autenticado
         if ($checkToken && !empty($params_array)) {
@@ -140,33 +143,32 @@ class UserController extends Controller
             //Sacar usuario identificado
             $user = $jwtAuth->checkToken($token, true);
 
-        //Validar datos
-        $validate = Validator::make($params_array, [
-            'name' => 'required|alpha',
-            'surname' => 'required|alpha',
-            'email' => 'required|email|unique:users,' . $user->sub
-        ]);
+            //Validar datos
+            $validate = Validator::make($params_array, [
+                'name' => 'required|alpha',
+                'surname' => 'required|alpha',
+                'email' => 'required|email|unique:users,' . $user->sub
+            ]);
 
-        //Quitar los campos que no quiero actualizar
-        unset($params_array['id']);
-        unset($params_array['role']);
-        unset($params_array['password']);
-        unset($params_array['created_at']);
-        unset($params_array['remember_token']);
-
-
-        //Actualizar el usuario en la base de datos
-        $user_update = User::where('id', $user->sub)->update($params_array);
+            //Quitar los campos que no quiero actualizar
+            unset($params_array['id']);
+            unset($params_array['role']);
+            unset($params_array['password']);
+            unset($params_array['created_at']);
+            unset($params_array['remember_token']);
 
 
-        //Devolver array con el resultado
-        $data = array(
-            'code' => 200,
-            'status' => 'success',
-            'user' => $user,
-            'changes' => $params_array
-        );
+            //Actualizar el usuario en la base de datos
+            $user_update = User::where('id', $user->sub)->update($params_array);
 
+
+            //Devolver array con el resultado
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'user' => $user,
+                'changes' => $params_array
+            );
         } else {
             //Si el token no es válido, se devuelve un mensaje de error
             $data = [
@@ -178,17 +180,82 @@ class UserController extends Controller
         return response()->json($data, $data['code']); // Devolver el mensaje de error en formato json.
     }
 
+
     // Método para subir la imagen del usuario identificado por JWT (Json Web Token)
     public function upload(Request $request)
     {
-        $data = [
-            'status' => 'error',
-            'code' => 400,
-            'message' => 'El usuario no está identificado'
-        ];
-        return response()->json($data, $data['code'])->header('Content-Type', 'text/plain');
+        //Recoger los datos de la peticion es decir el archivo que se esta subiendo por POST
+        $image = $request->file('file0');
+
+
+        //Validar la imagen
+        $validate = Validator::make($request->all(), [
+            'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
+        ]);
+
+
+        //Guardar imagen
+        if (!$image || $validate->fails()) {
+            $data = [
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'Error al subir la imagen'
+            ];
+        } else {
+            $image_name = time() . $image->getClientOriginalName();
+            Storage::disk('users')->put($image_name, File::get($image));
+
+            //Devolver el resultado
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'image' => $image_name
+            ];
+        }
+        return response()->json($data, $data['code']);
     }
 
+    // Método para obtener la imagen del usuario identificado por JWT (Json Web Token)
+    public function getImage($filename)
+    {
+        //Comprobar si existe el fichero
+        $isset = Storage::disk('users')->exists($filename);
 
+        if ($isset) {
+            //Conseguir la imagen
+            $file = Storage::disk('users')->get($filename);
 
+            //Devolver la imagen
+            return new Response($file, 200);
+        } else {
+            //Mostrar un error
+            $data = [
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'La imagen no existe'
+            ];
+        }
+        return response()->json($data, $data['code']);
+    }
+
+    // Método para obtener los datos de un usuario
+    public function detail($id)
+    {
+        $user = User::find($id);
+
+        if (is_object($user)) {
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'user' => $user
+            ];
+        } else {
+            $data = [
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El usuario no existe'
+            ];
+        }
+        return response()->json($data, $data['code']);
+    }
 }
