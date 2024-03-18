@@ -86,4 +86,15 @@ class CategoryController extends Controller
         // Devolver el resultado
         return response()->json($data, $data['code']);
     }
+
+    // Método para actualizar una categoría
+    public function update($id, Request $request)
+    {
+        // Recoger los datos por post
+        // Validar los datos
+        // Quitar lo que no quiero actualizar
+        // Actualizar el registro en concreto
+        // Devolver algo
+
+    }
 }

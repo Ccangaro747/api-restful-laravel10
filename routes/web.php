@@ -59,3 +59,7 @@ Route::get('/api/detail/{id}', 'App\Http\Controllers\UserController@detail');
 // Rutas del controlador de categorias
 
 Route::resource('/api/category', 'App\Http\Controllers\CategoryController');
+
+// Rutas del controlador de entradas
+
+Route::resource('/api/post', 'App\Http\Controllers\PostController'); //La entidad se llama post y el controlador PostController
