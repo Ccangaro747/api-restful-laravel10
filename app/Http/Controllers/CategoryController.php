@@ -95,6 +95,5 @@ class CategoryController extends Controller
         // Quitar lo que no quiero actualizar
         // Actualizar el registro en concreto
         // Devolver algo
-
     }
 }

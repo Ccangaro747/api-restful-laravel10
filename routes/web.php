@@ -63,3 +63,11 @@ Route::resource('/api/category', 'App\Http\Controllers\CategoryController');
 // Rutas del controlador de entradas
 
 Route::resource('/api/post', 'App\Http\Controllers\PostController'); //La entidad se llama post y el controlador PostController
+
+Route::post('/api/post/upload', 'App\Http\Controllers\PostController@upload');
+
+Route::get('/api/post/image/{filename}', 'App\Http\Controllers\PostController@getImage');
+
+Route::get('/api/post/category/{id}', 'App\Http\Controllers\PostController@getPostsByCategory');
+
+Route::get('/api/post/user/{id}', 'App\Http\Controllers\PostController@getPostsByUser');
