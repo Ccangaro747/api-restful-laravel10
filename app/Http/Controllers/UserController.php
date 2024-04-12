@@ -80,10 +80,10 @@ class UserController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    // Método para loguear al usuario y conseguir el token de autenticación de usuario identificado por JWT (Json Web Token) 
+    // Método para loguear al usuario y conseguir el token de autenticación de usuario identificado por JWT (Json Web Token)
     public function login(Request $request)
     {
-        $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController 
+        $jwtAuth = new JwtAuth(); // Instanciar la clase JwtAuth para poder usar sus métodos y propiedades en este controlador UserController
 
 
         // Recibir los datos por POST
@@ -122,7 +122,7 @@ class UserController extends Controller
             }
         }
 
-        return response()->json($singup, 200); // Llamar al método singup de la clase JwtAuth para loguear al usuario y conseguir el token de autenticación de usuario identificado por JWT (Json Web Token) 
+        return response()->json($singup, 200); // Llamar al método singup de la clase JwtAuth para loguear al usuario y conseguir el token de autenticación de usuario identificado por JWT (Json Web Token)
     }
 
     // Método para actualizar los datos del usuario identificado por JWT (Json Web Token)
