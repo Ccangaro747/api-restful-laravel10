@@ -21,7 +21,7 @@ class JwtAuth
     {
         // Buscar si existe el usuario con el correo electrónico proporcionado
         $user = User::where('email', $email)->first();
-    
+
         // Comprobar si el usuario existe y si la contraseña es correcta
         if ($user && Hash::check($password, $user->password)) {
             // Generar el token de autenticación
@@ -31,15 +31,17 @@ class JwtAuth
                 'name' => $user->name,
                 'surname' => $user->surname,
                 'iat' => time(),
-                'exp' => time() + (7 * 24 * 60 * 60)
+                'exp' => time() + (7 * 24 * 60 * 60),
+                'description' => $user->description, //Lo agregue cuando realicé la funcion de mostrar el avatar de usuario
+                'image' => $user->image //Lo agregue cuando realicé la funcion de mostrar el avatar de usuario
             );
-    
+
             // Codificar el token JWT
             $jwt = JWT::encode($token, $this->key, 'HS256');
-    
+
             // Decodificar el token para obtener sus datos si es necesario
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);
-    
+
             // Devolver el token o los datos decodificados según corresponda
             if (is_null($getToken)) {
                 return $jwt;
@@ -51,13 +53,13 @@ class JwtAuth
             return ['status' => 'error', 'message' => 'Credenciales incorrectas'];
         }
 
-    
+
     }
     public function checkToken($jwt, $getIdentity = false)
     {
         // Comprobar si el token es válido
         $auth = false;
-        try {        
+        try {
             $jwt = str_replace('"', '', $jwt); // Quitar las comillas dobles del token si las tiene para evitar errores al decodificarlo
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);
         } catch (\UnexpectedValueException $e) {
@@ -65,21 +67,21 @@ class JwtAuth
         } catch (\DomainException $e) {
             $auth = false;
         }
-    
+
         // Comprobar si el token decodificado contiene los datos del usuario
         if (!empty($decoded) && is_object($decoded) && isset($decoded->sub)) {
             $auth = true;
         } else {
             $auth = false;
         }
-    
+
         // Devolver los datos del usuario si es necesario
         if ($getIdentity) {
             return $decoded;
         }
-    
+
         // Devolver el resultado de la comprobación del token
         return $auth;
     }
 
-}    
+}
