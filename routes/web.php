@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Post;
 use App\Category;
-
+use App\Http\Controllers\UserController;
 // Cargando clases
 use App\Http\Middleware\ApiAuthMiddleware;
 
@@ -51,6 +51,7 @@ Route::put('/api/update', 'App\Http\Controllers\UserController@update');
 Route::post('/api/update', 'App\Http\Controllers\UserController@update');
 
 Route::post('/api/upload', 'App\Http\Controllers\UserController@upload')->middleware(ApiAuthMiddleware::class);
+//Route::post('/api/upload', [UserController::class, 'upload']);
 
 Route::get('/api/avatar/{filename}', 'App\Http\Controllers\UserController@getImage');
 
