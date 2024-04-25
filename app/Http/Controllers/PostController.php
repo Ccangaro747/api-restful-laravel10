@@ -31,7 +31,8 @@ class PostController extends Controller
     //Método que nos va a devolver un post en concreto.
     public function show($id)
     {
-        $post = Post::find($id)->load('category'); //Cargamos la relación con la categoría, para que nos devuelva también la categoría a la que pertenece el post que hemos obtenido de la base de datos. Find nos va a devolver el post que tenga el id que le pasamos por parámetro.
+        $post = Post::find($id)->load('category')
+                                ->load('user'); //Cargamos la relación con la categoría, para que nos devuelva también la categoría a la que pertenece el post que hemos obtenido de la base de datos. Find nos va a devolver el post que tenga el id que le pasamos por parámetro.
 
         if (is_object($post)) { //Si el post que hemos obtenido de la base de datos es un objeto, devolvemos una respuesta JSON con un array que contiene el código de la respuesta, el estado de la respuesta, y el post que hemos obtenido de la base de datos.
             $data = [

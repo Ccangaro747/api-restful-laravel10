@@ -72,3 +72,4 @@ Route::get('/api/post/image/{filename}', 'App\Http\Controllers\PostController@ge
 Route::get('/api/post/category/{id}', 'App\Http\Controllers\PostController@getPostsByCategory');
 
 Route::get('/api/post/user/{id}', 'App\Http\Controllers\PostController@getPostsByUser');
+

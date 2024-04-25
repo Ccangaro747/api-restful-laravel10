@@ -11,7 +11,7 @@ class Post extends Model
 
     protected $table = 'posts';
     protected $fillable = [
-       'title', 'content', 'category_id'
+       'title', 'content', 'category_id', 'image' //Agregue image para que cuando edite un post se pueda actualizar la imagen
     ];
 
     // Relación uno a muchos inversa (muchos a uno) es decir, muchos posts pertenecen a un usuario
